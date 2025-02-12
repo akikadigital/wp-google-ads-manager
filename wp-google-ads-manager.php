@@ -28,6 +28,14 @@ function wp_google_ads_manager_settings_init()
     register_setting('wp-google-ads-manager-group', 'wp_gam_post_page_ads');
     register_setting('wp-google-ads-manager-group', 'wp_gam_target_categories');
 
+    $homepage_ads = get_option('wp_gam_homepage_ads');
+    if ($homepage_ads) $homepage_ads = explode(',', $homepage_ads);
+    register_setting('wp-google-ads-manager-group', 'wp_gam_homepage_header_js');
+    foreach ($homepage_ads as $value) {
+        register_setting('wp-google-ads-manager-group', 'wp_gam_homepage_' . $value);
+        // eg wp_gam_homepage_top_banner
+    }
+
     // Fetch target categories
     $target_categories = get_option('wp_gam_target_categories');
     if ($target_categories) {
@@ -232,11 +240,19 @@ function wp_google_ads_manager_settings_render()
 }
 
 // Retrieve ad manager content from the database (if needed)
-function wp_gam_display_ad($title, $category = null)
+function get_post_ad($title)
 {
-    if ($category) {
-        return get_option('wp_gam_' . $category . '_' . $title);
+    echo get_option('wp_gam_' . $title);
+}
+
+function get_category_ad($title, $category)
+{
+    $ad = get_option('wp_gam_' . $category . '_' . $title);
+    if ($ad) {
+        echo $ad;
+    } else {
+        echo get_option('wp_gam_default_' . $title);
     }
-    return get_option('wp_gam_' . $title);
+    return;
 }
 ?>

@@ -1,0 +1,1 @@
+# WP Google Ads Manager
