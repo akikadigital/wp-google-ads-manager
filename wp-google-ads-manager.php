@@ -11,12 +11,6 @@
  * Text Domain: akika-google-ad-manager
  */
 
-function wp_gam_enqueue_styles()
-{
-    wp_enqueue_style('wp-google-ads-manager', plugin_dir_url(__FILE__) . 'includes/styles.css');
-}
-add_action('admin_enqueue_scripts', 'wp_gam_enqueue_styles');
-
 
 // Register settings
 add_action('admin_init', 'wp_google_ads_manager_settings_init');
@@ -91,6 +85,13 @@ function wp_google_ads_manager_settings_render()
     if ($post_page_ads) $post_page_ads = explode(',', $post_page_ads);
 ?>
     <div class="wrap">
+        <style>
+            a.wp-google-ads-manager-color-dark {
+                color: #1d2327 !important;
+                text-decoration: none !important;
+                font-weight: bold;
+            }
+        </style>
         <h1>WP Google Ads Manager</h1>
         <p>
             This plugin allows you to manage Google Ads on your Wordpress site. You can add ads to the homepage, category pages, post pages. You can also target all or specific categories.
@@ -103,7 +104,7 @@ function wp_google_ads_manager_settings_render()
             <?php do_settings_sections('wp-google-ads-manager-group'); ?>
 
             <div id="accordion">
-                <h3><a href="#" class="wp-google-ads-manager-color-dark">General Settings</a></h3>
+                <h3 class="bg-dark"><a href="#" class="wp-google-ads-manager-color-dark">General Settings</a></h3>
                 <div>
                     <table class="form-table">
                         <tr>
