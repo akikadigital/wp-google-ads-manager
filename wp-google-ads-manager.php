@@ -11,6 +11,8 @@
  * Text Domain: akika-google-ad-manager
  */
 
+/// Enable html text on widget
+add_filter('widget_text', 'do_shortcode');
 
 // Register settings
 add_action('admin_init', 'wp_google_ads_manager_settings_init');
@@ -256,4 +258,110 @@ function get_category_ad($title, $category)
     }
     return;
 }
+
+function display_dynamic_ads()
+{
+    echo get_option('wp_gam_header_js');
+
+    if (is_front_page()) {
+        // Display homepage ads
+        echo get_option('wp_gam_homepage_header_js');
+    } elseif (is_category()) {
+        // $category = get_queried_object();
+        // $category_slug = $category->slug;
+        $category_slug = "default";
+        echo get_option('wp_gam_' . $category_slug . '_header_js');
+    } elseif (is_single()) {
+        // $categories = get_the_category();
+        // if (!empty($categories)) {
+        //     $category_slug = $categories[0]->slug;
+        //     echo get_option('wp_gam_' . $category_slug . '_post_header_js');
+        // }
+        $category_slug = "default";
+        echo get_option('wp_gam_' . $category_slug . '_post_header_js');
+    }
+}
+add_action('wp_head', 'display_dynamic_ads');
+
+function wp_google_ads_manager_dynamic_ads_shortcode($atts)
+{
+    // Define default attributes
+    $atts = shortcode_atts(
+        array(
+            'ad_position' => '', // Default to an empty string
+        ),
+        $atts,
+        'dynamic_ads'
+    );
+
+    // Extract attributes
+    $ad_position = $atts['ad_position'];
+
+    // Start output buffering
+    ob_start();
+
+    // Display the appropriate ad based on the ad_position parameter
+    if ($ad_position) {
+        $ad_code = get_option('wp_gam_' . $ad_position);
+        if ($ad_code) {
+            echo $ad_code;
+        } else {
+            echo '<!-- Ad code not found for position: ' . esc_html($ad_position) . ' -->';
+        }
+    } else {
+        echo '<!-- No ad position specified -->';
+    }
+
+    // Return the output
+    return ob_get_clean();
+}
+add_shortcode('dynamic_ads', 'wp_google_ads_manager_dynamic_ads_shortcode');
+
+
+/// Add mid content ads
+
+add_filter('the_content', 'wp_google_ads_manager_insert_mid_content_ads');
+
+function wp_google_ads_manager_insert_mid_content_ads($content)
+{
+
+    $category_slug = "default";
+
+
+
+    $ad_code_1 = '<div class="jeg_ad jeg_article_top jnews_article_top_ads mb-4">' . get_option('wp_gam_' . $category_slug . '_post_midcontent_1') . '</div>';
+    $ad_code_2 = '<div class="jeg_ad jeg_article_top jnews_article_top_ads mb-4">' . get_option('wp_gam_' . $category_slug . '_post_midcontent_2') . '</div>';
+    $ad_code_3 = '<div class="jeg_ad jeg_article_top jnews_article_top_ads mb-4">' . get_option('wp_gam_' . $category_slug . '_post_midcontent_3') . '</div>';
+
+    // append ad_code_1 on line 2, ad_code_2 on line 4, ad_code_3 on line 6
+
+    if (is_single()) {
+        $content = prefix_insert_after_paragraph($ad_code_1, 2, $content);
+        $content = prefix_insert_after_paragraph($ad_code_2, 5, $content);
+        $content = prefix_insert_after_paragraph($ad_code_3, 8, $content);
+    }
+
+    return $content;
+}
+
+// Parent Function that makes the magic happen
+function prefix_insert_after_paragraph($insertion, $paragraph_id, $content)
+{
+    $closing_p = '</p>';
+    $paragraphs = explode($closing_p, $content);
+    foreach ($paragraphs as $index => $paragraph) {
+
+        if (trim($paragraph)) {
+            $paragraphs[$index] .= $closing_p;
+        }
+
+        if ($paragraph_id == $index + 1) {
+            $paragraphs[$index] .= $insertion;
+        }
+    }
+
+    return implode('', $paragraphs);
+}
+
+
 ?>
