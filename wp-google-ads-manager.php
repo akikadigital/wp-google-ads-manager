@@ -266,11 +266,6 @@ function display_dynamic_ads()
     if (is_front_page()) {
         // Display homepage ads
         echo get_option('wp_gam_homepage_header_js');
-    } elseif (is_category()) {
-        // $category = get_queried_object();
-        // $category_slug = $category->slug;
-        $category_slug = "default";
-        echo get_option('wp_gam_' . $category_slug . '_header_js');
     } elseif (is_single()) {
         // $categories = get_the_category();
         // if (!empty($categories)) {
@@ -279,6 +274,11 @@ function display_dynamic_ads()
         // }
         $category_slug = "default";
         echo get_option('wp_gam_' . $category_slug . '_post_header_js');
+    } else {
+        // $category = get_queried_object();
+        // $category_slug = $category->slug;
+        $category_slug = "default";
+        echo get_option('wp_gam_' . $category_slug . '_header_js');
     }
 }
 add_action('wp_head', 'display_dynamic_ads');
@@ -362,6 +362,5 @@ function prefix_insert_after_paragraph($insertion, $paragraph_id, $content)
 
     return implode('', $paragraphs);
 }
-
 
 ?>
